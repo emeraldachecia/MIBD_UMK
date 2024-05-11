@@ -1,0 +1,28 @@
+{
+  "name": "mibd_umk",
+  "version": "1.0.0",
+  "description": "Tugas Besar MIBD Kelompok 4",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/emeraldachecia/MIBD_UMK.git"
+  },
+  "author": "Kelompok4",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/emeraldachecia/MIBD_UMK/issues"
+  },
+  "homepage": "https://github.com/emeraldachecia/MIBD_UMK#readme",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "express-ejs-layouts": "^2.5.1",
+    "express-fileupload": "^1.5.0",
+    "mysql2": "^3.9.7",
+    "nodemon": "^3.1.0"
+  }
+}
