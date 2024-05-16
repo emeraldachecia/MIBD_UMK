@@ -3,6 +3,7 @@ import bodyParser from "body-parser";
 import fileUpload from "express-fileupload";
 import expressLayouts from "express-ejs-layouts";
 import routes from "./routes.js";
+import { UsahaMikroKecilDB } from "../config/UsahaMikroKecilDB.js";
 
 const app = express();
 const port = 5000;
