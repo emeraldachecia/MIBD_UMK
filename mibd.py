@@ -45,6 +45,7 @@ def create_tables():
             Owner VARCHAR(255),
             City VARCHAR(100),
             Province VARCHAR(100),
+            Balance DECIMAL(30,2)
             deleted_at DATETIME
         )
     END
