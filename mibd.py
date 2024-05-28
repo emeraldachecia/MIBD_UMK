@@ -25,6 +25,7 @@ def create_tables():
             PhoneNum VARCHAR(12) NOT NULL UNIQUE,
             OTP VARCHAR(6),
             OTP_Created_At DATETIME,
+            Role VARCHAR(50) NOT NULL,
             first_login_done BIT DEFAULT 0, -- Added first_login_done column
             deleted_at DATETIME
         )
