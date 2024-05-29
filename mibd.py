@@ -262,26 +262,23 @@ def admin_menu():
 def umk_menu(umk_id):
     while True:
         print("\nUMK Menu")
-        print("1. Manage Profile")
-        print("2. Manage Products")
-        print("3. Record Transactions")
-        print("4. View Financial Report")
-        print("5. View Sales Report")
-        print("6. Log Out")
+        print("1. Manage Products")
+        print("2. Record Transactions")
+        print("3. View Financial Report")
+        print("4. View Sales Report")
+        print("5. Log Out")
 
         choice = input("Enter your choice: ")
 
         if choice == '1':
-            manage_profile(umk_id)
-        elif choice == '2':
             manage_products(umk_id)
-        elif choice == '3':
+        elif choice == '2':
             record_transactions(umk_id)
-        elif choice == '4':
+        elif choice == '3':
             view_financial_report(umk_id)
-        elif choice == '5':
+        elif choice == '4':
             view_sales_report(umk_id)
-        elif choice == '6':
+        elif choice == '5':
             break
         else:
             print("Invalid choice. Please try again.")
@@ -351,11 +348,117 @@ def view_top_n_umks():
     for umk in umks:
         print(umk)
 
-def manage_profile(umk_id):
-    print(f"Managing profile for UMK_ID {umk_id}")
-
 def manage_products(umk_id):
-    print(f"Managing products for UMK_ID {umk_id}")
+    while True:
+        print("\nManage Products Menu")
+        print("1. Add Product")
+        print("2. View Products")
+        print("3. Update Product")
+        print("4. Delete Product")
+        print("5. Back to UMK Menu")
+
+        choice = input("Enter your choice: ")
+
+        if choice == '1':
+            add_product(umk_id)
+        elif choice == '2':
+            view_products(umk_id)
+        elif choice == '3':
+            update_product(umk_id)
+        elif choice == '4':
+            delete_product(umk_id)
+        elif choice == '5':
+            break
+        else:
+            print("Invalid choice. Please try again.")
+
+def add_product(umk_id):
+    code = input("Enter Product Code: ")
+    name = input("Enter Product Name: ")
+    image = input("Enter Image (as hex or binary): ").encode()
+    description = input("Enter Description: ")
+    unit = input("Enter Unit: ")
+    price = float(input("Enter Price: "))
+
+    try:
+        cursor.execute("""
+        INSERT INTO Products (UMK_ID, Code, Name, Image, Description, Unit, Price)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (umk_id, code, name, image, description, unit, price))
+        conn.commit()
+        print("Product added successfully.")
+    except Exception as e:
+        conn.rollback()
+        print(f"Error occurred: {e}")
+
+def view_products(umk_id):
+    cursor.execute("SELECT * FROM Products WHERE UMK_ID = ? AND deleted_at IS NULL", (umk_id,))
+    products = cursor.fetchall()
+    for product in products:
+        print(product)
+
+def update_product(umk_id):
+    product_id = int(input("Enter Product ID to update: "))
+
+    cursor.execute("SELECT * FROM Products WHERE Product_ID = ? AND UMK_ID = ? AND deleted_at IS NULL", (product_id, umk_id))
+    product = cursor.fetchone()
+    if not product:
+        print("Product not found.")
+        return
+
+    print("Current product details:")
+    print(f"Code: {product.Code}")
+    print(f"Name: {product.Name}")
+    print(f"Description: {product.Description}")
+    print(f"Unit: {product.Unit}")
+    print(f"Price: {product.Price}")
+
+    code = input("Enter new Product Code (leave blank to keep current): ") or product.Code
+    name = input("Enter new Product Name (leave blank to keep current): ") or product.Name
+    image = input("Enter new Image (as hex or binary, leave blank to keep current): ").encode() or product.Image
+    description = input("Enter new Description (leave blank to keep current): ") or product.Description
+    unit = input("Enter new Unit (leave blank to keep current): ") or product.Unit
+    price = input("Enter new Price (leave blank to keep current): ")
+    price = float(price) if price else product.Price
+
+    confirm = input(f"Are you sure you want to update product ID {product_id}? (yes/no): ").strip().lower()
+    if confirm != 'yes':
+        print("Update cancelled.")
+        return
+
+    try:
+        cursor.execute("""
+        UPDATE Products
+        SET Code = ?, Name = ?, Image = ?, Description = ?, Unit = ?, Price = ?
+        WHERE Product_ID = ? AND UMK_ID = ?
+        """, (code, name, image, description, unit, price, product_id, umk_id))
+        conn.commit()
+        print("Product updated successfully.")
+    except Exception as e:
+        conn.rollback()
+        print(f"Error occurred: {e}")
+
+def delete_product(umk_id):
+    product_id = int(input("Enter Product ID to delete: "))
+
+    cursor.execute("SELECT * FROM Products WHERE Product_ID = ? AND UMK_ID = ? AND deleted_at IS NULL", (product_id, umk_id))
+    product = cursor.fetchone()
+    if not product:
+        print("Product not found.")
+        return
+
+    confirm = input(f"Are you sure you want to delete product ID {product_id}? (yes/no): ").strip().lower()
+    if confirm != 'yes':
+        print("Delete cancelled.")
+        return
+
+    try:
+        cursor.execute("UPDATE Products SET deleted_at = ? WHERE Product_ID = ? AND UMK_ID = ?", (datetime.datetime.now(), product_id, umk_id))
+        conn.commit()
+        print("Product deleted successfully.")
+    except Exception as e:
+        conn.rollback()
+        print(f"Error occurred: {e}")
 
 def record_transactions(umk_id):
     print(f"Recording transactions for UMK_ID {umk_id}")
