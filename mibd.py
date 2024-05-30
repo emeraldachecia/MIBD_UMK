@@ -3,8 +3,8 @@ import datetime
 import random
 
 DRIVER_NAME = 'SQL SERVER'
-SERVER_NAME = r'Rey-PC\SQLEXPRESS'
-DATABASE_NAME = 'students'
+SERVER_NAME = r'EMEE\SQLEXPRESS'
+DATABASE_NAME = 'MIBD_UMK'
 
 connection_string = f"""
     DRIVER={{{DRIVER_NAME}}};
@@ -45,7 +45,7 @@ def create_tables():
             Owner VARCHAR(255),
             City VARCHAR(100),
             Province VARCHAR(100),
-            Balance DECIMAL(30,2)
+            Balance DECIMAL(30,2),
             deleted_at DATETIME
         )
     END
