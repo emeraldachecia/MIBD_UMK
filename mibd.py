@@ -3,8 +3,8 @@ import datetime
 import random
 
 DRIVER_NAME = 'SQL SERVER'
-SERVER_NAME = r'Rey-PC\SQLEXPRESS'
-DATABASE_NAME = 'students'
+SERVER_NAME = r'EMEE\SQLEXPRESS'
+DATABASE_NAME = 'MIBD_UMK'
 
 connection_string = f"""
     DRIVER={{{DRIVER_NAME}}};
