@@ -2,10 +2,12 @@ import pyodbc as odbc
 import datetime
 import random
 
+# Informasi koneksi ke database SQL Server
 DRIVER_NAME = 'SQL SERVER'
 SERVER_NAME = r'Rey-PC\SQLEXPRESS'
 DATABASE_NAME = 'students'
 
+# Membuat string koneksi
 connection_string = f"""
     DRIVER={{{DRIVER_NAME}}};
     SERVER={SERVER_NAME};
@@ -13,10 +15,13 @@ connection_string = f"""
     Trusted_Connection=yes;
 """
 
+# Membuka koneksi ke database
 conn = odbc.connect(connection_string)
 cursor = conn.cursor()
 
+# Fungsi untuk membuat tabel-tabel yang dibutuhkan
 def create_tables():
+    # Membuat tabel Users
     cursor.execute("""
     IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Users')
     BEGIN
@@ -32,6 +37,7 @@ def create_tables():
     END
     """)
 
+    # Membuat tabel UMK_Profiles
     cursor.execute("""
     IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'UMK_Profiles')
     BEGIN
@@ -52,6 +58,7 @@ def create_tables():
     END
     """)
 
+    # Membuat tabel Products
     cursor.execute("""
     IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Products')
     BEGIN
@@ -70,6 +77,7 @@ def create_tables():
     END
     """)
 
+    # Membuat tabel Transactions
     cursor.execute("""
     IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Transactions')
     BEGIN
@@ -88,6 +96,7 @@ def create_tables():
     END
     """)
 
+    # Membuat tabel Kota
     cursor.execute("""
     IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Cities')
     BEGIN
@@ -98,6 +107,7 @@ def create_tables():
     END
     """)
 
+    # Membuat tabel Provinsi
     cursor.execute("""
     IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Provinces')
     BEGIN
@@ -112,6 +122,7 @@ def create_tables():
     print("Tabel berhasil dibuat.")
     
 
+# Fungsi untuk memasukkan data dummy ke tabel Products dan Transactions
 def insert_dummy_data():
     # Data dummy untuk tabel Products
     products = [
@@ -170,13 +181,15 @@ def insert_dummy_data():
         conn.rollback()
         print(f"Terjadi kesalahan: {e}")
 
-
+# Fungsi untuk menghasilkan OTP
 def generate_otp():
     return str(random.randint(100000, 999999))
 
+# Fungsi untuk validasi nomor telepon
 def validate_phone_number(phone_num):
     return phone_num.isdigit()
 
+# Fungsi untuk mendaftarkan admin
 def register_admin():
     phone_num = input("Masukkan Nomor Telepon untuk Admin: ")
     if not validate_phone_number(phone_num):
@@ -198,6 +211,7 @@ def register_admin():
         conn.rollback()
         print(f"Terjadi kesalahan: {e}")
 
+# Fungsi untuk mendaftarkan UMK
 def register_umk():
     name = input("Masukkan Nama UMK: ")
     description = input("Masukkan Deskripsi: ")
@@ -234,6 +248,7 @@ def register_umk():
         conn.rollback()
         print(f"Terjadi kesalahan: {e}")
 
+# Fungsi untuk login sebagai admin menggunakan nomor telepon
 def login_as_admin(phone_num):
     cursor.execute("SELECT User_ID, Role FROM Users WHERE PhoneNum = ? AND Role = 'Administrator' AND deleted_at IS NULL", (phone_num,))
     user = cursor.fetchone()
@@ -243,6 +258,7 @@ def login_as_admin(phone_num):
         print("Nomor telepon tidak valid atau pengguna tidak ditemukan.")
         return None
 
+# Fungsi untuk login menggunakan OTP
 def login_with_otp(otp):
     cursor.execute("SELECT User_ID, Role, PhoneNum FROM Users WHERE OTP = ? AND deleted_at IS NULL", (otp,))
     user = cursor.fetchone()
@@ -261,6 +277,7 @@ def login_with_otp(otp):
         print("OTP tidak valid atau pengguna tidak ditemukan.")
         return None
 
+# Fungsi untuk login sebagai UMK menggunakan nomor telepon
 def login_as_umk(phone_num):
     cursor.execute("SELECT User_ID, Role FROM Users WHERE PhoneNum = ? AND Role = 'UMK' AND first_login_done = 1 AND deleted_at IS NULL", (phone_num,))
     user = cursor.fetchone()
@@ -270,6 +287,7 @@ def login_as_umk(phone_num):
         print("Nomor telepon tidak valid atau pengguna tidak ditemukan.")
         return None
 
+# Menu utama untuk admin
 def admin_menu():
     while True:
         print("\nMenu Administrator")
@@ -297,30 +315,7 @@ def admin_menu():
             print("Pilihan tidak valid. Silakan coba lagi.")
 
 
-def umk_menu(umk_id):
-    while True:
-        print("\nMenu UMK")
-        print("1. Kelola Produk")
-        print("2. Catat Transaksi")
-        print("3. Lihat Laporan Keuangan")
-        print("4. Lihat Laporan Penjualan")
-        print("5. Keluar")
-
-        choice = input("Masukkan pilihan Anda: ")
-
-        if choice == '1':
-            manage_products(umk_id)
-        elif choice == '2':
-            record_transactions(umk_id)
-        elif choice == '3':
-            view_financial_report(umk_id)
-        elif choice == '4':
-            view_sales_report(umk_id)
-        elif choice == '5':
-            break
-        else:
-            print("Pilihan tidak valid. Silakan coba lagi.")
-
+# Fungsi untuk menyetujui pendaftaran UMK
 def approve_umk_registration():
     print("\nMenu Persetujuan UMK")
     print("1. Lihat UMK yang Menunggu Persetujuan")
@@ -352,12 +347,14 @@ def approve_umk_registration():
     else:
         print("Pilihan tidak valid. Silakan coba lagi.")
 
+# Fungsi untuk melihat UMK yang terdaftar
 def view_registered_umks():
     cursor.execute("SELECT * FROM UMK_Profiles WHERE deleted_at IS NULL")
     umks = cursor.fetchall()
     for umk in umks:
         print(umk)
 
+# Fungsi untuk melihat produk teratas berdasarkan jumlah transaksi
 def view_top_n_products(n):
     cursor.execute("""
     SELECT p.Name, COUNT(t.Transaction_ID) as Frequency
@@ -376,6 +373,7 @@ def view_top_n_products(n):
     else:
         print("Tidak ada data produk.")
 
+# Fungsi untuk melihat UMK teratas berdasarkan jumlah transaksi
 def view_top_n_umk(n):
     cursor.execute("""
     SELECT u.Name, COUNT(t.Transaction_ID) as Frequency
@@ -394,8 +392,7 @@ def view_top_n_umk(n):
     else:
         print("Tidak ada data UMK.")
 
-
-
+# Fungsi untuk mengelola produk UMK
 def manage_products(umk_id):
     while True:
         print("\nMenu Kelola Produk")
@@ -420,6 +417,7 @@ def manage_products(umk_id):
         else:
             print("Pilihan tidak valid. Silakan coba lagi.")
 
+# Fungsi untuk menambah produk UMK
 def add_product(umk_id):
     code = input("Masukkan Kode Produk: ")
     name = input("Masukkan Nama Produk: ")
@@ -439,12 +437,14 @@ def add_product(umk_id):
         conn.rollback()
         print(f"Terjadi kesalahan: {e}")
 
+# Fungsi untuk melihat produk UMK
 def view_products(umk_id):
     cursor.execute("SELECT * FROM Products WHERE UMK_ID = ? AND deleted_at IS NULL", (umk_id,))
     products = cursor.fetchall()
     for product in products:
         print(product)
 
+# Fungsi untuk memperbarui produk UMK
 def update_product(umk_id):
     product_id = int(input("Masukkan ID Produk yang ingin diperbarui: "))
 
@@ -486,6 +486,7 @@ def update_product(umk_id):
         conn.rollback()
         print(f"Terjadi kesalahan: {e}")
 
+# Fungsi untuk menghapus produk UMK
 def delete_product(umk_id):
     product_id = int(input("Masukkan ID Produk yang ingin dihapus: "))
 
@@ -508,7 +509,7 @@ def delete_product(umk_id):
         conn.rollback()
         print(f"Terjadi kesalahan: {e}")
 
-
+# Fungsi untuk melihat pembukuan
 def view_bookkeeping():
     cursor.execute("""
     SELECT UMK_ID, Type, Amount, Date, Description, Product_ID
@@ -532,8 +533,7 @@ def view_bookkeeping():
     else:
         print("Tidak ada data transaksi.")
 
-
-
+# Fungsi untuk melihat laporan keuangan UMK
 def view_financial_report(umk_id):
     end_date = input("Masukkan tanggal akhir (YYYY-MM-DD): ")
     
@@ -593,6 +593,7 @@ def umk_menu(umk_id):
         else:
             print("Pilihan tidak valid. Silakan coba lagi.")
 
+# Fungsi untuk melihat laporan penjualan UMK
 def view_sales_report(umk_id):
     print(f"Melihat laporan penjualan untuk UMK_ID {umk_id}")
     start_date = input("Masukkan tanggal mulai (YYYY-MM-DD): ")
@@ -627,6 +628,7 @@ def view_sales_report(umk_id):
     else:
         print("Tidak ada data penjualan dalam rentang tanggal yang diberikan.")
 
+# Fungsi untuk menampilkan menu utama
 def display_main_menu():
     print("1. Masuk sebagai Admin")
     print("2. Masuk sebagai UMK dengan OTP")
@@ -635,6 +637,7 @@ def display_main_menu():
     print("5. Daftarkan Admin")
     print("6. Keluar")
 
+# Fungsi utama yang menjalankan aplikasi
 def main():
     create_tables()
     insert_dummy_data()
