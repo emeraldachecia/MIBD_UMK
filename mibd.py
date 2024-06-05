@@ -623,7 +623,7 @@ def view_sales_report(umk_id):
     if sales_report:
         print(f"\nLaporan Penjualan Produk dari {start_date.date()} sampai {end_date.date()}")
         for row in sales_report:
-            print(f"Produk: {row.Product_Name}, Kuantitas: {row.Frequency}, Penerimaan: {row.Total_Income}, Penerima: {row.Receiver}")
+            print(f"Produk: {row.Product_Name}, Kuantitas: {row.Frequency}, Pemasukan: {row.Total_Income}, Penerima: {row.Receiver}")
     else:
         print("Tidak ada data penjualan dalam rentang tanggal yang diberikan.")
 
