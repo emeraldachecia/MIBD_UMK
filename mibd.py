@@ -19,6 +19,7 @@ connection_string = f"""
 conn = odbc.connect(connection_string)
 cursor = conn.cursor()
 
+
 # Fungsi untuk membuat tabel-tabel yang dibutuhkan
 def create_tables():
     # Membuat tabel Users
@@ -124,6 +125,19 @@ def create_tables():
 
 # Fungsi untuk memasukkan data dummy ke tabel Products dan Transactions
 def insert_dummy_data():
+    # Mengecek apakah tabel Products sudah memiliki data
+    cursor.execute("SELECT COUNT(*) FROM Products")
+    product_count = cursor.fetchone()[0]
+
+    # Mengecek apakah tabel Transactions sudah memiliki data
+    cursor.execute("SELECT COUNT(*) FROM Transactions")
+    transaction_count = cursor.fetchone()[0]
+
+    # Jika kedua tabel sudah memiliki data, tidak melakukan insert lagi
+    if product_count > 0 and transaction_count > 0:
+        print("Data dummy sudah ada, tidak melakukan insert lagi.")
+        return
+
     # Data dummy untuk tabel Products
     products = [
         (1, 'P001', 'Electric Kettle', None, '1.7L capacity electric kettle', 'Unit 1', 100.00, None),
@@ -180,6 +194,9 @@ def insert_dummy_data():
     except Exception as e:
         conn.rollback()
         print(f"Terjadi kesalahan: {e}")
+
+# Menjalankan fungsi insert_dummy_data
+insert_dummy_data()
 
 # Fungsi untuk menghasilkan OTP
 def generate_otp():
