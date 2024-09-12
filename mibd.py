@@ -4,8 +4,8 @@ import random
 
 # Informasi koneksi ke database SQL Server
 DRIVER_NAME = 'SQL SERVER'
-SERVER_NAME = r'Rey-PC\SQLEXPRESS'
-DATABASE_NAME = 'students'
+SERVER_NAME = r'EMEE\SQLEXPRESS'
+DATABASE_NAME = 'mibd_umk'
 
 # Membuat string koneksi
 connection_string = f"""
@@ -158,21 +158,11 @@ def insert_dummy_data():
         (8, 'P016', 'Air Fryer', None, 'Digital air fryer with touchscreen', 'Unit 16', 1600.00, None),
         (9, 'P017', 'Electric Shaver', None, 'Cordless electric shaver', 'Unit 17', 1700.00, None),
         (9, 'P018', 'Bluetooth Headset', None, 'In-ear Bluetooth headset', 'Unit 18', 1800.00, None),
-        (10, 'P019', 'Smart Thermostat', None, 'Wi-Fi smart thermostat', 'Unit 19', 1900.00, None),
-        (10, 'P020', 'Robot Vacuum', None, 'Smart robot vacuum cleaner', 'Unit 20', 2000.00, None),
-        (11, 'P021', 'Smartwatch', None, 'Fitness tracking smartwatch', 'Unit 21', 2100.00, None),
-        (11, 'P022', 'Wireless Earbuds', None, 'True wireless earbuds', 'Unit 22', 2200.00, None),
-        (12, 'P023', 'Portable Projector', None, 'Mini portable projector', 'Unit 23', 2300.00, None),
-        (12, 'P024', 'Electric Scooter', None, 'Foldable electric scooter', 'Unit 24', 2400.00, None),
-        (13, 'P025', 'VR Headset', None, 'Virtual reality headset', 'Unit 25', 2500.00, None),
-        (13, 'P026', 'Digital Camera', None, 'Compact digital camera', 'Unit 26', 2600.00, None),
-        (14, 'P027', 'Smart Doorbell', None, 'Wi-Fi enabled smart doorbell', 'Unit 27', 2700.00, None),
-        (14, 'P028', 'Electric Bike', None, 'Foldable electric bike', 'Unit 28', 2800.00, None)
     ]
 
     # Data dummy untuk tabel Transactions
     transactions = []
-    for umk_id in range(1, 15):
+    for umk_id in range(1, 10):
         for i in range(1, 3):  # Tambahkan dua transaksi per UMK_ID
             transactions.append((umk_id, 'income', 150.00 + umk_id * 10, datetime.datetime(2023, 1, i), 'Setor Modal', umk_id * 2 - 1, None))
             transactions.append((umk_id, 'income', 200.00 + umk_id * 10, datetime.datetime(2023, 1, i + 1), 'Penjualan Produk', umk_id * 2, None))
